@@ -1,9 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Zork
 {
     internal class Program
     {
+        private static string CurrentRoom
+        {
+            get
+            {
+                return _rooms[_location.Row, _location.Column];
+            }
+        }
+
         static void Main(string[] args)
         {
             Console.WriteLine("Welcome to Zork!");
@@ -12,7 +21,7 @@ namespace Zork
             Commands command = Commands.UNKNOWN;
             while (isRunning)
             {
-                Console.Write($"{_rooms[_location.Row, _location.Column]}\n> ");
+                Console.Write($"{CurrentRoom}\n> ");
                 command = ToCommand(Console.ReadLine().Trim());
                 //PascalCase
                 //thisIsCamelCase
