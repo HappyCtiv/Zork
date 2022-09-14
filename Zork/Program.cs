@@ -5,7 +5,7 @@ namespace Zork
 {
     internal class Program
     {
-        private static string CurrentRoom
+        private static string CurrentRoom //property,  private static string GetCurrentRoom() is method. Functionally equivalent
         {
             get
             {
@@ -15,7 +15,9 @@ namespace Zork
 
         static void Main(string[] args)
         {
+
             Console.WriteLine("Welcome to Zork!");
+
 
             bool isRunning = true;
             Commands command = Commands.UNKNOWN;
@@ -64,11 +66,10 @@ namespace Zork
 
 
         }
-
-        private static Commands ToCommand(string commandString) => Enum.TryParse(commandString, true, out Commands result) ? result : Commands.UNKNOWN;
-
         private static bool Move(Commands command)
         {
+            Assert.IsTrue(IsDirection(command), "Invalid direction.");
+
             bool didMove = false;
 
             switch (command)
@@ -97,11 +98,24 @@ namespace Zork
 
             return didMove;
         }
+        private static Commands ToCommand(string commandString) => Enum.TryParse(commandString, true, out Commands result) ? result : Commands.UNKNOWN;
+
+        private static bool IsDirection(Commands command) => _directions.Contains(command);
+
+
         private static readonly string[,] _rooms = {
             { "Rocky Trail", "South Of House", "Canyon View"},
             { "Forrest", "West of House", "Behind House"},
             { "Dense Woods",  "North of House", "Clearing"}
         };                                    //class member
+
+        private static readonly List<Commands> _directions = new List<Commands>
+        {
+            Commands.NORTH,
+            Commands.SOUTH,
+            Commands.EAST,
+            Commands.WEST
+        };
 
         private static (int Row, int Column) _location = (1,1);
     }
