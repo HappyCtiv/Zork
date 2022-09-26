@@ -7,10 +7,9 @@ namespace Zork
         public string Name { get; set; }
         public string Description { get; set; }
 
-        public Room(string name, string description = null) //Constractor, intialize the member of the class (same class name)
+        public Room(string name) //Constractor, intialize the member of the class
         {
             Name = name;
-            Description = description;
         }
 
         public override string ToString() => Name;
