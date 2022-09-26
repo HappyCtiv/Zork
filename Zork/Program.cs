@@ -13,30 +13,17 @@ namespace Zork
             Console.WriteLine("Welcome to Zork!");
             Game game = new Game();
             game.Run();
-
-
-
-
-
-
-
-
-
-
-            
-
-
-
-
-
-            //private static readonly List<Commands> _directions = new List<Commands>
-            //        {
-            //            Commands.NORTH,
-            //            Commands.SOUTH,
-            //            Commands.EAST,
-            //            Commands.WEST
-            //        };
-
-
         }
+
+
+
+
+
+
+
+
+
+    
     }
+}
+   

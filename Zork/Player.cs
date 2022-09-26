@@ -1,4 +1,6 @@
-﻿namespace Zork
+﻿using System.Collections.Generic;
+
+namespace Zork
 {
     internal class Player
     {
@@ -55,5 +57,13 @@
         private static (int Row, int Column) _location = (1, 1);
 
         private static bool IsDirection(Commands command) => _directions.Contains(command);
+
+        private static readonly List<Commands> _directions = new List<Commands>
+        {
+            Commands.NORTH,
+            Commands.SOUTH,
+            Commands.EAST,
+            Commands.WEST
+        };
     }
 }

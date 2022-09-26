@@ -42,7 +42,7 @@ namespace Zork
                     case Commands.SOUTH:
                     case Commands.EAST:
                     case Commands.WEST:
-                        if (Move(command))
+                        if (Player.Move(command))
                         {
                             outputString = $"You move {command}.";
                         }
