@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Newtonsoft.Json;
 
 namespace Zork
 {
@@ -16,7 +17,7 @@ namespace Zork
 
         static void Main(string[] args)
         {
-            string roomsFilename = args.Length > 0 ? args[0] : @"Content\Rooms.txt";
+            string roomsFilename = args.Length > 0 ? args[0] : @"Content\Rooms.json";
             InitializeRoomDescription(roomsFilename);
 
 
@@ -117,37 +118,13 @@ namespace Zork
 
         private static void InitializeRoomDescription(string roomsFilename)
         {
-            var roomMap = new Dictionary<string, Room>();
-            foreach (Room room in _rooms)
-            {
-                roomMap[room.Name] = room; //roomMap.Add(room.Name, room)
-            }
+  
 
-            string[] lines = File.ReadAllLines(roomsFilename);
-            foreach (string line in lines)
-            {
-                const string fieldDelimiter = "##";
-                const int exceptedFieldCount = 2;
-
-                string[] fields = line.Split(fieldDelimiter);
-                if (fields.Length != exceptedFieldCount)
-                {
-                    throw new InvalidDataException("Invalid record");
-                }
-
-                string name = fields[(int)Fields.Name];              // same as string name = fields[0];
-                string description = fields[(int)Fields.Description];
-
-                roomMap[name].Description = description;
-            }
+            _rooms = JsonConvert.DeserializeObject<Room[,]>(File.ReadAllText(roomsFilename));
 
         }
 
-        private static readonly Room[,] _rooms = {
-            { new Room("Rocky Trail"), new Room("South of House"), new Room("Canyon View") },
-            { new Room("Forest"), new Room("West of House"), new Room("Behind House") },
-            { new Room("Dense Woods"), new Room("North of House"), new Room("Clearing") }
-        };                                    //class member
+        private static Room[,] _rooms;                              //class member
 
         private static readonly List<Commands> _directions = new List<Commands>
         {
