@@ -17,11 +17,26 @@ namespace Zork
 
         [JsonIgnore]
         public IReadOnlyDictionary<Directions, Room> Neighbors { get; private set; }
+        [JsonProperty]
+        public List<Item> Inventory { get; set; }
+
+        private string[] InventoryNames { get; set; }
+
+        public Room(string name, string description, Dictionary<Directions, string> neighborNames, string[] inventroyNames)
+        {
+            Name = name;
+            Description = description;
+            NeighborNames = neighborNames ?? new Dictionary<Directions, string>();
+            //Inventory = inventory ?? new List<Item>(); // if (Inventory != null) { Inventory = inventory } else { Inventory = new List<Item>() }
+            InventoryNames = inventroyNames ?? new string[0];
+
+        }
+
 
         public static bool operator ==(Room lhs, Room rhs)
         {
             if (ReferenceEquals(lhs, rhs))
-            {
+            { 
                 return true;
             }
             if (lhs is null || rhs is null)
@@ -29,9 +44,10 @@ namespace Zork
                 return false;
             }
 
-            return lhs.Name == rhs.Name;
+            return lhs.Name == rhs.Name; // return string.Compare(lhs,Name, rhs.Name, ignoreCase: true) == 0
 
         }
+
 
         public static bool operator !=(Room lhs, Room rhs) => !(lhs == rhs);
         public override bool Equals(object obj) => obj is Room room ? this == room : false;
@@ -43,6 +59,15 @@ namespace Zork
                                                                  where room != null
                                                                  select (Direction: entry.Key, Room: room))
                                                                  .ToDictionary(pair => pair.Direction, pair => pair.Room);
+        public void UpdateInventory()
+        {
+            Inventory = new List<Item>();
+            foreach (var inventoryName in Inventory)
+            {
+                Inventory.Add(World.ItemsByName[inventoryName]);
+            }
+            InventoryNames = null;
+        }
 
     }
 }

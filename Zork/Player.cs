@@ -23,6 +23,9 @@ namespace Zork
             }
         }
 
+        public List<Item> Inventory { get; }
+
+
         public Player(World world, string startingLocation)
         {
             World = world;
@@ -31,13 +34,13 @@ namespace Zork
 
         public bool Move(Directions direction)
         {
-            bool isValidMove = Location.Neighbors.TryGetValue(direction, out Room destination);
-            if (isValidMove)
+            bool didMove = Location.Neighbors.TryGetValue(direction, out Room destination);
+            if (didMove)
             {
                 Location = destination;
             }
 
-            return isValidMove;
+            return didMove;
         }
     }
 }
