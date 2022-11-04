@@ -10,9 +10,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Content\Zork.json">
+    <ProjectReference Include="..\Zork.Common\Zork.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Content\Game.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties content_4game_1json__JsonSchema="https://carafe.fm/schema/draft-02/bundle.schema.json" /></VisualStudio></ProjectExtensions>
 
 </Project>

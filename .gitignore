@@ -1,5 +1,7 @@
 .vs/
-Zork/bin/
-Zork/obj/
+Zork.Cli/bin/
+Zork.Cli/obj/
+Zork.Common/bin/
+Zork.Common/obj/
 Backup
 UpgradeLog.htm
