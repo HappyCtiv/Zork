@@ -3,13 +3,13 @@ using Zork.Common;
 
 namespace Zork.Cli
 {
-    internal class ConsoleInputService
+    internal class ConsoleInputService : IInputService
     {
         public event EventHandler<string> InputReceived;
 
-        public void ProccessInput()
+        public void ProcessInput()
         {
-            string inputString = Console.ReadLine().Trim();
+            string inputString = Console.ReadLine();
             InputReceived?.Invoke(this, inputString);
         }
     }

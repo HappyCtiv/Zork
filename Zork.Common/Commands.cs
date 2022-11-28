@@ -4,6 +4,8 @@
     {
         Quit,
         Q = Quit,
+        Exit = Quit,
+        Bye = Quit,
         Look,
         L = Look,
         North,
@@ -21,6 +23,8 @@
         D = Drop,
         Inventory,
         I = Inventory,
+        Reward,
+        Score,
         Unknown
     }
 }

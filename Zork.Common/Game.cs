@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
+using System.Linq;
+using Newtonsoft.Json;
 
 namespace Zork.Common
 {
@@ -8,10 +8,17 @@ namespace Zork.Common
     {
         public World World { get; }
 
+        [JsonIgnore]
         public Player Player { get; }
 
+        [JsonIgnore]
+        public IInputService Input { get; private set; }
+
+        [JsonIgnore]
         public IOutputService Output { get; private set; }
-        public IInputService Input { get; private set; } 
+
+        [JsonIgnore]
+        public bool IsRunning { get; private set; }
 
         public Game(World world, string startingLocation)
         {
@@ -19,175 +26,155 @@ namespace Zork.Common
             Player = new Player(World, startingLocation);
         }
 
-        public void Run(IOutputService output)
+        public void Run(IInputService input, IOutputService output)
         {
-            Output = output;
+            Input = input ?? throw new ArgumentNullException(nameof(input));
+            Output = output ?? throw new ArgumentNullException(nameof(output));
 
-            Room previousRoom = null;
-            bool isRunning = true;
-            while (isRunning)
+            IsRunning = true;
+            Input.InputReceived += OnInputReceived;
+            Output.WriteLine("Welcome to Zork!");
+            Look();
+            Output.WriteLine($"\n{Player.CurrentRoom}");
+        }
+
+        public void OnInputReceived(object sender, string inputString)
+        {
+            char separator = ' ';
+            string[] commandTokens = inputString.Split(separator);
+
+            string verb;
+            string subject = null;
+            if (commandTokens.Length == 0)
             {
-                Output.WriteLine(Player.CurrentRoom);   
-                if (previousRoom != Player.CurrentRoom)
-                {
-                    Output.WriteLine(Player.CurrentRoom.Description);
+                return;
+            }
+            else if (commandTokens.Length == 1)
+            {
+                verb = commandTokens[0];
+            }
+            else
+            {
+                verb = commandTokens[0];
+                subject = commandTokens[1];
+            }
 
-                    foreach (Item item in Player.CurrentRoom.Inventory)
+            Room previousRoom = Player.CurrentRoom;
+            Commands command = ToCommand(verb);
+            switch (command)
+            {
+                case Commands.Quit:
+                    IsRunning = false;
+                    Output.WriteLine("Thank you for playing!");
+                    break;
+
+                case Commands.Look:
+                    Look();
+                    break;
+
+                case Commands.North:
+                case Commands.South:
+                case Commands.East:
+                case Commands.West:
+                    Directions direction = (Directions)command;
+                    Output.WriteLine(Player.Move(direction) ? $"You moved {direction}." : "The way is shut!");
+                    break;
+
+                case Commands.Reward:
+                    Output.WriteLine("Congratz, You`ve earned a point!");
+                    Player.Score++;
+                    break;
+
+                case Commands.Score:
+                    Output.Write($"Your score would be {Player.Score}, in {Player.Moves} move(s).");
+                    break;
+
+                case Commands.Take:
+                    if (string.IsNullOrEmpty(subject))
                     {
-                        Output.WriteLine(item.Description);
+                        Output.WriteLine("This command requires a subject.");
                     }
+                    else
+                    {
+                        Take(subject);
+                    }
+                    break;
 
-                    previousRoom = Player.CurrentRoom;
-                }
+                case Commands.Drop:
+                    if (string.IsNullOrEmpty(subject))
+                    {
+                        Output.WriteLine("This command requires a subject.");
+                    }
+                    else
+                    {
+                        Drop(subject);
+                    }
+                    break;
 
-                Output.Write("> ");
-
-                string inputString = Console.ReadLine().Trim();
-                char  separator = ' ';
-                string[] commandTokens = inputString.Split(separator);
-                
-                string verb = null;
-                string subject = null;
-                if (commandTokens.Length == 0)
-                {
-                    continue;
-                }
-                else if (commandTokens.Length == 1)
-                {
-                    verb = commandTokens[0];
-                }
-                else
-                {
-                    verb = commandTokens[0];
-                    subject = commandTokens[1];
-                }
-
-                Commands command = ToCommand(verb);
-
-                string outputString;
-                List<string> outputSubjects = new List<string>();
-
-                switch (command)
-                {
-                    case Commands.Quit:
-                        isRunning = false;
-                        outputString = "Thank you for playing!";
-                        break;
-
-                    case Commands.Look:
-                        outputString = Player.CurrentRoom.Description;
-                        foreach (Item item in Player.CurrentRoom.Inventory)
+                case Commands.Inventory:
+                    if (Player.Inventory.Count() == 0)
+                    {
+                        Output.WriteLine("You are empty handed.");
+                    }
+                    else
+                    {
+                        Output.WriteLine("You are carrying:");
+                        foreach (Item item in Player.Inventory)
                         {
-                            outputSubjects.Add(item.Description);
+                            Output.WriteLine(item.InventoryDescription);
                         }
-                        break;
-                    case Commands.North:
-                    case Commands.South:
-                    case Commands.East:
-                    case Commands.West:
-                        Directions direction = (Directions)command;
-                        if (Player.Move(direction))
-                        {
-                            outputString = $"You moved {direction}.";
-                        }
-                        else
-                        {
-                            outputString = "The way is shut!";
-                        }
-                        break;
+                    }
+                    break;
 
-                    case Commands.Take:
-                        switch (commandTokens.Length)
-                        {
-                            case 1:
-                                outputString = "What do you want to take?";
-                                break;
-                            default:
-                                if (World.ItemsByName.TryGetValue(commandTokens[1].ToUpper(), out Item item)) // if we add enum instead of ifs we can go with --  
-                                {                                                     //-- if (World.ItemsByName.TryGetValue(commandTokens[(int)ToCommand(subject)].ToUpper(), out Item item))
-                                    if (Player.CurrentRoom.Inventory.Contains(item)) 
-                                    {
-                                        outputString = $"You took {item.Name}";
-                                        Player.Take(item);
-                                        Player.CurrentRoom.deleteItem(item);
-                                    }
-                                    else if (Player.Inventory.Contains(item))
-                                    {
-                                        outputString = "You already have that.";
-                                    }
-                                    else
-                                    {
-                                        outputString = "You can`t see any such thing.";
-                                    }
-                                }
-                                else
-                                {
-                                    outputString = "You can`t see any such thing.";
-                                }
-                                break;
-                        }
-                        break;
+                default:
+                    Output.WriteLine("Unknown command.");
+                    break;
+            }
 
-                    case Commands.Drop:
-                        switch (commandTokens.Length)
-                        {
-                            case 1:
-                                outputString = "What do you want to drop?";
-                                break;
-                            default:
-                                if (World.ItemsByName.TryGetValue(commandTokens[1].ToUpper(), out Item item))
-                                {
-                                    if (Player.Inventory.Contains(item))
-                                    {
-                                        outputString = $"Dropped {item.Name}.";
-                                        Player.Drop(item);
-                                        Player.CurrentRoom.addItem(item);
-                                    }
-                                    else if (Player.CurrentRoom.Inventory.Contains(item))
-                                    {
-                                        outputString = $"{item.Name} is already here.";
-                                    }
-                                    else
-                                    {
-                                        outputString = "You do not have any such thing";
-                                    }
-                                }
-                                else
-                                {
-                                    outputString = "You do not have any such thing.";
-                                }
-                                break;
-                        }
-                        break;
- 
-                    case Commands.Inventory:
-                        if (Player.Inventory.Count > 0)
-                        {
-                            outputString = "Your inventory contains: ";
-                            foreach (Item item in Player.Inventory)
-                            {
-                                outputSubjects.Add(item.Name); // Outputs Items before everything.
-                            }
-                        }
-                        else
-                        {
-                            outputString = "You are empty handed.";
-                        }
-                        break;
+            if (ReferenceEquals(previousRoom, Player.CurrentRoom) == false)
+            {
+                Look();
+            }
 
-                    default:
-                        outputString = "Unknown command.";
-                        break;
-                }
+            Output.WriteLine($"\n{Player.CurrentRoom}");
+        }
+        
+        private void Look()
+        {
+            Output.WriteLine(Player.CurrentRoom.Description);
+            foreach (Item item in Player.CurrentRoom.Inventory)
+            {
+                Output.WriteLine(item.LookDescription);
+            }
+        }
 
-                Output.WriteLine(outputString);
+        private void Take(string itemName)
+        {
+            Item itemToTake = Player.CurrentRoom.Inventory.FirstOrDefault(item => string.Compare(item.Name, itemName, ignoreCase: true) == 0);
+            if (itemToTake == null)
+            {
+                Output.WriteLine("You can't see any such thing.");                
+            }
+            else
+            {
+                Player.AddItemToInventory(itemToTake);
+                Player.CurrentRoom.RemoveItemFromInventory(itemToTake);
+                Output.WriteLine("Taken.");
+            }
+        }
 
-                foreach (string outputS in outputSubjects)
-                {
-                    Output.WriteLine(outputS);
-                }
-
-                Output.WriteLine("");
+        private void Drop(string itemName)
+        {
+            Item itemToDrop = Player.Inventory.FirstOrDefault(item => string.Compare(item.Name, itemName, ignoreCase: true) == 0);
+            if (itemToDrop == null)
+            {
+                Output.WriteLine("You can't see any such thing.");                
+            }
+            else
+            {
+                Player.CurrentRoom.AddItemToInventory(itemToDrop);
+                Player.RemoveItemFromInventory(itemToDrop);
+                Output.WriteLine("Dropped.");
             }
         }
 

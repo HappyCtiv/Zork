@@ -5,13 +5,51 @@ namespace Zork.Common
 {
     public class Player
     {
+        public EventHandler<Room> LocationChange;
+        public EventHandler<int> MoveChange;
+        public EventHandler<int> ScoreChange;
+
         public Room CurrentRoom
         {
             get => _currentRoom;
-            set => _currentRoom = value;
+            set 
+            {
+                if (_currentRoom != value) 
+                { 
+                    _currentRoom = value;
+                    LocationChange?.Invoke(this, _currentRoom);
+                }
+            }
+        }
+        public int Moves
+        {
+            get => _moves;
+            set 
+            {
+                if (_moves != value)
+                { 
+                    _moves = value;
+                    MoveChange?.Invoke(this, _moves);
+                }
+            }
+
         }
 
-        public List<Item> Inventory { get; }
+        public int Score
+        {
+            get => _score;
+            set
+            {
+                if (_score != value)
+                { 
+                    _score = value;
+                    ScoreChange?.Invoke(this, _score);
+                }
+            }
+ 
+        }
+
+        public IEnumerable<Item> Inventory => _inventory;
 
         public Player(World world, string startingLocation)
         {
@@ -22,7 +60,7 @@ namespace Zork.Common
                 throw new Exception($"Invalid starting location: {startingLocation}");
             }
 
-            Inventory = new List<Item>();
+            _inventory = new List<Item>();
         }
 
         public bool Move(Directions direction)
@@ -32,23 +70,33 @@ namespace Zork.Common
             {
                 CurrentRoom = neighbor;
             }
-
+            Moves++;
             return didMove;
         }
 
-        public void Take(Item takenItem)
+        public void AddItemToInventory(Item itemToAdd)
         {
-            Inventory.Add(takenItem);
+            if (_inventory.Contains(itemToAdd))
+            {
+                throw new Exception($"Item {itemToAdd} already exists in inventory.");
+            }
 
+            _inventory.Add(itemToAdd);
+            Moves++;
         }
 
-        public void Drop(Item droppedItem)
+        public void RemoveItemFromInventory(Item itemToRemove)
         {
-            Inventory.Remove(droppedItem);
-
+            if (_inventory.Remove(itemToRemove) == false)
+            {
+                throw new Exception("Could not remove item from inventory.");
+            }
+            Moves++;
         }
 
-        private World _world;
+        private readonly World _world;
         private Room _currentRoom;
+        private readonly List<Item> _inventory;
+        private int _moves, _score;
     }
 }
