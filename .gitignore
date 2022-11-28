@@ -8,7 +8,9 @@ UpgradeLog.htm
 Zork.Unity/Library/
 Zork.Unity/Logs/
 Zork.Unity/.sln
-Zork.Unity/Temp
+Zork.Unity/Temp/
+Zork.Unity/.vscode/
+Zork.Unity/obj/
 # This .gitignore file should be placed at the root of your Unity project directory
 #
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
