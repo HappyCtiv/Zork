@@ -28,6 +28,7 @@
         Health,
         DamagePlayer, //Debug Purposes.
         HealPlayer, //DEBUG PURPOSES
+        Use,
         Unknown
     }
 }

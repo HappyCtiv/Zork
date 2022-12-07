@@ -156,6 +156,17 @@ namespace Zork.Common
                     }
                     break;
 
+                case Commands.Use:
+                    if (string.IsNullOrEmpty(subject))
+                    {
+                        Output.WriteLine("What do you want to use?");
+                    }
+                    else
+                    {
+                        Use(subject);
+                    }
+                    break;
+
                 default:
                     Output.WriteLine("Unknown command.");
                     break;
@@ -214,7 +225,23 @@ namespace Zork.Common
             }
         }
 
+        private void Use(string itemName)
+        {
+            Item itemToUse = Player.Inventory.FirstOrDefault(item =>string.Compare(item.Name, itemName, ignoreCase:true) == 0);
+            if (itemToUse == null)
+            {
+                Output.WriteLine("You can't see any such thing.");
+            }
+            else if (itemToUse.Name == "Potion") //DUMB SOLUTION
+                                                 // (itemToUse.ItemConsumable == "Yes")
+            {
+                Player.RemoveItemFromInventory(itemToUse);
+                Player.Heal(15);
+                Output.WriteLine($"{itemToUse} was used.");
+                Output.WriteLine($"Player`s health now is {Player.Health}");
+            }
 
+        }
         private static Commands ToCommand(string commandString) => Enum.TryParse(commandString, true, out Commands result) ? result : Commands.Unknown;
     }
 }

@@ -16,6 +16,12 @@
         "Name": "Leaves",
         "LookDescription": "There is a pile of leaves here.",
         "InventoryDescription": "A pile of leaves."
+      },
+      {
+        "Name": "Potion",
+        "LookDescription": "There is a potion on a ground. Seems Like it might restore your health.",
+        "InventoryDescription": "Potion. It might restore some of your health.",
+        "Consumable": "Yes"
       }
     ],
     "Rooms": [
@@ -29,7 +35,8 @@
         },
         "InventoryNames": [
           "Mat",
-          "Mailbox"
+          "Mailbox",
+          "Potion"
         ]
       },
       {

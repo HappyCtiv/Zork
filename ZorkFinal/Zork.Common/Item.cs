@@ -7,12 +7,16 @@
         public string LookDescription { get; }
 
         public string InventoryDescription { get; }
+        
+        public string ItemConsumable { get; }
 
-        public Item(string name, string lookDescription, string inventoryDescription)
+
+        public Item(string name, string lookDescription, string inventoryDescription, string itemConsumable)
         {
             Name = name;
             LookDescription = lookDescription;
             InventoryDescription = inventoryDescription;
+            ItemConsumable = itemConsumable;
         }
 
         public override string ToString() => Name;
