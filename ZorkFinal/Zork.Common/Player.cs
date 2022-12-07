@@ -8,7 +8,7 @@ namespace Zork.Common
         public EventHandler<Room> LocationChange;
         public EventHandler<int> MoveChange;
         public EventHandler<int> ScoreChange;
-
+        public EventHandler<int> HealthChange;
         public Room CurrentRoom
         {
             get => _currentRoom;
@@ -49,6 +49,19 @@ namespace Zork.Common
  
         }
 
+        public int Health
+        {
+            get => _health;
+            set
+            {
+                if(_health != value)
+                {
+                    _health = value;
+                    HealthChange?.Invoke(this, _health);
+                }
+            }
+        }
+
         public IEnumerable<Item> Inventory => _inventory;
 
         public Player(World world, string startingLocation)
@@ -61,6 +74,25 @@ namespace Zork.Common
             }
 
             _inventory = new List<Item>();
+        }
+
+        public int Damage(int dmg) //to be reworked
+        {
+            Health -= dmg;
+            return Health;
+        }
+
+        public int Heal(int heal) //to be reworked
+        {
+            if((Health+heal) < 100)
+            {
+                Health += heal;
+            }
+            else
+            {
+                Health = 100;
+            }
+            return Health;
         }
 
         public bool Move(Directions direction)
@@ -98,5 +130,6 @@ namespace Zork.Common
         private Room _currentRoom;
         private readonly List<Item> _inventory;
         private int _moves, _score;
+        private int _health;
     }
 }

@@ -25,6 +25,9 @@
         I = Inventory,
         Reward,
         Score,
+        Health,
+        DamagePlayer, //Debug Purposes.
+        HealPlayer, //DEBUG PURPOSES
         Unknown
     }
 }

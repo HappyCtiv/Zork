@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Newtonsoft.Json;
 
 namespace Zork.Common
@@ -31,6 +32,7 @@ namespace Zork.Common
             Input = input ?? throw new ArgumentNullException(nameof(input));
             Output = output ?? throw new ArgumentNullException(nameof(output));
 
+            Player.Health = 100;
             IsRunning = true;
             Input.InputReceived += OnInputReceived;
             Output.WriteLine("Welcome to Zork!");
@@ -126,6 +128,34 @@ namespace Zork.Common
                     }
                     break;
 
+                case Commands.Health:
+                    Output.WriteLine($"Current Health: {Player.Health}.");
+                    break;
+
+                case Commands.DamagePlayer: // DEBUG PURPOSES
+                    if(string.IsNullOrEmpty(subject))
+                    {
+                        Output.WriteLine("How much damage do you want to apply to your character?");
+                    }
+                    else
+                    {
+                        Player.Damage(int.Parse(subject));
+                        Output.WriteLine($"Player`s health now is {Player.Health}");
+                    }
+                    break;
+
+                case Commands.HealPlayer:
+                    if (string.IsNullOrEmpty(subject))
+                    {
+                        Output.WriteLine("How much health do you want to restore to your character?");
+                    }
+                    else
+                    {
+                        Player.Heal(int.Parse(subject));
+                        Output.WriteLine($"Player`s health now is {Player.Health}");
+                    }
+                    break;
+
                 default:
                     Output.WriteLine("Unknown command.");
                     break;
@@ -134,6 +164,12 @@ namespace Zork.Common
             if (ReferenceEquals(previousRoom, Player.CurrentRoom) == false)
             {
                 Look();
+            }
+            
+            if (Player.Health <= 0) //Not Sure. Decide on it later. Mb Add restart if you have time.
+            {
+                Output.WriteLine("You died.");
+                IsRunning= false;
             }
 
             Output.WriteLine($"\n{Player.CurrentRoom}");
@@ -177,6 +213,7 @@ namespace Zork.Common
                 Output.WriteLine($"{itemToDrop} was dropped.");
             }
         }
+
 
         private static Commands ToCommand(string commandString) => Enum.TryParse(commandString, true, out Commands result) ? result : Commands.Unknown;
     }
