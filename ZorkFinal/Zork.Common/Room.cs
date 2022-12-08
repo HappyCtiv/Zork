@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿    using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,7 +23,12 @@ namespace Zork.Common
         [JsonProperty]
         private string[] InventoryNames { get; set; }
 
-        public Room(string name, string description, Dictionary<Directions, string> neighborNames, string[] inventoryNames)
+        [JsonIgnore]
+        public IEnumerable<Enemy> Enemies => _enemies;
+        [JsonProperty]
+        private string[] EnemiesNames { get; set; }
+
+        public Room(string name, string description, Dictionary<Directions, string> neighborNames, string[] inventoryNames, string[] enemiesNames)
         {
             Name = name;
             Description = description;
@@ -32,6 +37,9 @@ namespace Zork.Common
 
             InventoryNames = inventoryNames ?? new string[0];
             _inventory = new List<Item>();
+
+            EnemiesNames = enemiesNames ?? new string[0];
+            _enemies = new List<Enemy>();
         }
 
         public static bool operator ==(Room lhs, Room rhs)
@@ -75,6 +83,16 @@ namespace Zork.Common
             InventoryNames = null;
         }
 
+        public void UpdateEnemy(World world)
+        {
+            foreach (var enemiesName in EnemiesNames)
+            {
+                _enemies.Add(world.EnemiesByName[enemiesName]);
+            }
+
+            EnemiesNames = null;
+        }
+
         public void AddItemToInventory(Item itemToAdd)
         {
             if (_inventory.Contains(itemToAdd))
@@ -93,9 +111,17 @@ namespace Zork.Common
             }
         }
 
+        public void KillEnemyInTheRoom(Enemy enemyToKill)
+        {
+            if (_enemies.Remove(enemyToKill)==false)
+            {
+                throw new Exception("Could not kill enemy in the room.");
+            }
+        }
         public override string ToString() => Name;
 
         private readonly List<Item> _inventory;
         private readonly Dictionary<Directions, Room> _neighbors;
+        private readonly List<Enemy> _enemies;
     }
 }

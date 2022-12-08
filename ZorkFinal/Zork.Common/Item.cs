@@ -8,15 +8,18 @@
 
         public string InventoryDescription { get; }
         
-        public string ItemConsumable { get; }
+        public bool Consumable { get; }
+        
+        public int Heal { get; }
 
 
-        public Item(string name, string lookDescription, string inventoryDescription, string itemConsumable)
+        public Item(string name, string lookDescription, string inventoryDescription, bool itemConsumable, int heal)
         {
             Name = name;
             LookDescription = lookDescription;
             InventoryDescription = inventoryDescription;
-            ItemConsumable = itemConsumable;
+            Consumable = itemConsumable;
+            Heal = heal;
         }
 
         public override string ToString() => Name;

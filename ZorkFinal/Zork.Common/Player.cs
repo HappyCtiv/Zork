@@ -126,17 +126,6 @@ namespace Zork.Common
             Moves++;
         }
 
-        //public void UseItemFromInventory(Item itemToUse)
-        //{
-        //    if(_inventory.Contains(itemToUse) == false)
-        //    {
-        //        throw new Exception("Could not find item in inventory.");
-        //    }
-
-
-        //    Moves++;
-        //}
-
         private readonly World _world;
         private Room _currentRoom;
         private readonly List<Item> _inventory;

@@ -12,6 +12,8 @@ namespace Zork.Common
         [JsonIgnore]
         public Player Player { get; }
 
+        public Enemy Enemy { get; }
+
         [JsonIgnore]
         public IInputService Input { get; private set; }
 
@@ -72,6 +74,7 @@ namespace Zork.Common
 
                 case Commands.Look:
                     Look();
+                    Player.Moves++;
                     break;
 
                 case Commands.North:
@@ -193,6 +196,11 @@ namespace Zork.Common
             {
                 Output.WriteLine(item.LookDescription);
             }
+            foreach (Enemy enemy in Player.CurrentRoom.Enemies)
+            {
+                Output.WriteLine(enemy.EnemyDescription);
+            }
+ 
         }
 
         private void Take(string itemName)
@@ -232,11 +240,10 @@ namespace Zork.Common
             {
                 Output.WriteLine("You can't see any such thing.");
             }
-            else if (itemToUse.Name == "Potion") //DUMB SOLUTION
-                                                 // (itemToUse.ItemConsumable == "Yes")
+            else if (itemToUse.Heal > 0)  // itemToUse.Consumable == true???
             {
                 Player.RemoveItemFromInventory(itemToUse);
-                Player.Heal(15);
+                Player.Heal(itemToUse.Heal);
                 Output.WriteLine($"{itemToUse} was used.");
                 Output.WriteLine($"Player`s health now is {Player.Health}");
             }
