@@ -29,6 +29,11 @@
         DamagePlayer, //Debug Purposes.
         HealPlayer, //DEBUG PURPOSES
         Use,
+        Drink = Use,
+        Consume = Use,
+        Attack,
+        A = Attack,
+        Hit = Attack,
         Unknown
     }
 }

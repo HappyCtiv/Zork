@@ -49,6 +49,8 @@ namespace Zork.Common
 
             string verb;
             string subject = null;
+            string with = null;
+            string weapon = null;
             if (commandTokens.Length == 0)
             {
                 return;
@@ -57,10 +59,22 @@ namespace Zork.Common
             {
                 verb = commandTokens[0];
             }
+            else if (commandTokens.Length == 2)
+            {
+                verb = commandTokens[0];
+                subject = commandTokens[1];
+            }
+            else if(commandTokens.Length == 3) // not sure if I need it
+            {
+                Output.WriteLine("Unknown command.");
+                return;
+            }
             else
             {
                 verb = commandTokens[0];
                 subject = commandTokens[1];
+                with = commandTokens[2];
+                weapon = commandTokens[3];
             }
 
             Room previousRoom = Player.CurrentRoom;
@@ -170,8 +184,27 @@ namespace Zork.Common
                     }
                     break;
 
+                case Commands.Attack:
+                    if (Player.CurrentRoom.Enemies.Count() > 0)
+                    {
+                        if ((!string.IsNullOrEmpty(subject)) && (!string.IsNullOrEmpty(with)) && (!string.IsNullOrEmpty(weapon)))
+                        {
+                            Attack(weapon, subject);
+
+                        }
+                        else
+                        {
+                            Output.WriteLine("What do you want to use to attack and whom do you want to attack?");
+                        }
+                    }
+                    else
+                    {
+                        Output.WriteLine("There is no one to attack");
+                    }
+                    break;
                 default:
                     Output.WriteLine("Unknown command.");
+                    Player.Moves++;
                     break;
             }
 
@@ -231,6 +264,55 @@ namespace Zork.Common
                 Player.RemoveItemFromInventory(itemToDrop);
                 Output.WriteLine($"{itemToDrop} was dropped.");
             }
+        }
+
+        private void Attack(string itemName, string enemyName)
+        {
+            Item itemToAttack = Player.Inventory.FirstOrDefault(item => string.Compare(item.Name, itemName, ignoreCase: true) == 0);
+            Enemy enemyToAttack = Player.CurrentRoom.Enemies.FirstOrDefault(enemy => string.Compare(enemy.Name, enemyName, ignoreCase: true) ==0);
+
+            if (itemToAttack == null)
+            {
+                Output.WriteLine("You can`t see any such thing.");
+            }
+            else
+            {
+                if (itemToAttack.Attack == 0)
+                {
+                    Output.WriteLine("This item can only tickles enemies.");
+                }
+                else
+                {
+                    if (enemyToAttack == null)
+                    {
+                        Output.WriteLine("There is no such enemy in this room.");
+                    }
+                    else
+                    {
+                        enemyToAttack.Health -= itemToAttack.Attack;
+                        Output.WriteLine($"You hit {enemyToAttack.Name} with {itemToAttack.Name} dealing him {itemToAttack.Attack} damage.");
+
+                        if (itemToAttack.Heal > 0)
+                        {
+                            Player.Heal(itemToAttack.Heal);
+                            Output.WriteLine($"{itemToAttack.EffectDescription}. It restores you{itemToAttack.Heal} health.");
+                        }
+
+                        if(enemyToAttack.Health>0)// mb can be added to another script
+                        {
+                            Player.Damage(enemyToAttack.Damage);
+                            Output.WriteLine($"{enemyToAttack.Name} {enemyToAttack.AtackDescription}. This action leaves you with {Player.Health} health");
+                        }
+                        else
+                        {
+                            Player.CurrentRoom.KillEnemyInTheRoom(enemyToAttack);
+                            Player.Score++;
+                            Output.WriteLine($"{enemyToAttack.DefeatDescription}");
+                        }
+                    }
+                }    
+            }
+            Player.Moves++;
         }
 
         private void Use(string itemName)

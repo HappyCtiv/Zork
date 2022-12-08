@@ -60,6 +60,7 @@ public class UnityOutputService : MonoBehaviour, IOutputService
             string overflowing = textLine.text.Substring(textLine.firstOverflowCharacterIndex);
             textLine.text = textLine.text.Remove(textLine.firstOverflowCharacterIndex);
             ParseAndWriteLine(overflowing);
+            textLine.ForceMeshUpdate();
         }
 
 

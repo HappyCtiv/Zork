@@ -5,23 +5,51 @@
       {
         "Name": "Mat",
         "LookDescription": "A rubber mat saying 'Welcome to Zork!' lies here.",
-        "InventoryDescription": "A welcome mat."
+        "InventoryDescription": "A welcome mat.",
+        "Consumable": false
       },
       {
         "Name": "Mailbox",
         "LookDescription": "There is a small mailbox here.",
-        "InventoryDescription": "A small mailbox."
+        "InventoryDescription": "A small mailbox.",
+        "Consumable": false
       },
       {
         "Name": "Leaves",
         "LookDescription": "There is a pile of leaves here.",
-        "InventoryDescription": "A pile of leaves."
+        "InventoryDescription": "A pile of leaves.",
+        "Consumable": false
       },
       {
         "Name": "Potion",
         "LookDescription": "There is a potion on a ground. Seems Like it might restore your health.",
         "InventoryDescription": "Potion. It might restore some of your health.",
-        "Consumable": "Yes"
+        "Consumable": true,
+        "Heal": 15
+      },
+      {
+        "Name": "Sword",
+        "LookDescription": "There is a rusty sword on a ground. Seems like it can still slash.",
+        "InventoryDescription": "A sword.",
+        "Attack": 3
+      },
+      {
+        "Name": "Blooden",
+        "LookDescription": "There is a bloody sword that consumes all the surronding light. Seems like it might be special. When you focus your attention on this item, you notice an engraving 'Blooden'",
+        "InventoryDescription": "Sword with engraving 'Blooden'.",
+        "EffectDescription": "You see how some life energy transfers from your opponent to you.",
+        "Attack": 20,
+        "Heal": 10
+      }
+    ],
+    "Enemies": [
+      {
+        "Name": "Orc",
+        "EnemyDescription": "There is an orc - a green muscular creature that brings you fear with its each step.",
+        "DefeatDescription": "Orc`s head slides past your feet, you feel like a hero.",
+        "AtackDescription": "takes out the maze and strongly swings it to your side.",
+        "Health": 20,
+        "Damage": 7
       }
     ],
     "Rooms": [
@@ -36,7 +64,8 @@
         "InventoryNames": [
           "Mat",
           "Mailbox",
-          "Potion"
+          "Potion",
+          "Sword"
         ]
       },
       {
@@ -46,7 +75,10 @@
           "North": "Forest 2",
           "East": "Behind House",
           "West": "West of House"
-        }
+        },
+        "EnemiesNames": [
+          "Orc"
+        ]
       },
       {
         "Name": "South of House",
@@ -80,7 +112,10 @@
         "NeighborNames": {
           "South": "Clearing",
           "East": "Clearing"
-        }
+        },
+        "EnemiesNames": [
+          "Orc"
+        ]
       },
       {
         "Name": "Forest 3",
@@ -88,7 +123,10 @@
         "NeighborNames": {
           "North": "South of House",
           "East": "Clearing"
-        }
+        },
+        "InventoryNames": [
+          "Blooden"
+        ]
       },
       {
         "Name": "Clearing",
@@ -97,8 +135,11 @@
           "West": "Forest 2",
           "South": "Forest 3"
         },
-        "IventoryNames": [
+        "InventoryNames": [
           "Leaves"
+        ],
+        "EnemiesNames": [
+          "Orc"
         ]
       }
     ]
